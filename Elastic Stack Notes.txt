@@ -1,0 +1,106 @@
+## Elastic Stack
+# Centralized Logging with the Elastic Stack: Getting Started
+
+# Elasticsearch
+# Logstash - *Data Collection Engine
+1. Ingest
+2. Enhance or modify
+3. Forward 
+- Aggregates, filters, and supplements log data
+- Forwards altered logs to Elasticsearch
+- Sending logs directly to Elasticsearch
+  without Logstash can lead to inconsistent data
+
+# Kibana
+- Web-based front-end
+- Works easily with Elasticsearch for charts,
+  graphs, and visualizing data
+
+# Beats
+- Small, lightweight utilities for reading logs
+from a variety of sources. Usually sends data
+to Logstash.
+
+Filebeat: Text log files
+Metricbeat: OS & applications
+Packetbeat: Network monitoring
+Winlogbeat: Windows Event log
+Libbeat: Write your own
+- Using GoLang
+
+Alerting
+- Helps track conditions based on Elasticsearch
+  data
+- Continually monitors log data for pre-configured
+  conditions
+- Send notifications to email, Slack, Hipchat,
+  and PagerDuty out of the box.
+
+# Installing Elasticsearch on Linux (Ubuntu)
+- Installation Instructions TBC
+- Test Ubuntu using: cat /etc/issue.net
+Ubuntu 16.10
+
+
+
+
+# Introduction to Logstash
+- Logstash Configuration
+  input  {  Where is the data coming from
+            Logs? Beats?
+  }
+  filter {  How should we parse the data?
+            Ignore some? Modify any?
+  }
+  output {  Where should we store the logs?
+            Backend? Elasticsearch?
+  }
+
+- Logstash Plugins
+  Out of the box can read apache logs, log4j
+  files, Windows Event log, and more...
+
+  Included filters can read raw test, parse csv,
+  or look up geo/location information by IP
+  address, or reading json.
+
+- Logstash filters
+  grok filter - for parsing unstructured data
+                and turn into structured field
+                data for later use for searching
+  geoip filter - Uses grok 1st to parse out the IP
+
+# Installing Logstash (Unbuntu)
+- Installation Instructions TBC
+
+
+
+
+# visualizing with Kibana
+- General graphing and visualization tool
+  written in Node.json
+- Free, works great with Elasticsearch,
+  includes a ton of visualization options
+  and widgets
+- Easy to create useful dashboards and share
+  them with coworkers
+
+# Installing and Configuring Kibana (Unbuntu)
+- Installation Instructions TBC
+
+
+
+
+
+# Setting up logstash for Beats
+- TBC
+
+# Creating Metricbeat dashboards
+- TBC
+
+## Instrumenting Linux Servers
+- Installing and Configuring Filebeat
+- Creating Linux dashboards
+
+# Instrumenting Network Traffic
+
