@@ -36,21 +36,91 @@ Alerting
 - Send notifications to email, Slack, Hipchat,
   and PagerDuty out of the box.
 
-# Installing Elasticsearch on Linux (Ubuntu)
-- Installation Instructions TBC
+
+## Installing Elasticsearch on Linux (Ubuntu)
+- Installation Instructions (added 19/08/2019)
 - Test Ubuntu using: cat /etc/issue.net
 Ubuntu 16.10
+ifconfig # take inet address 192.168.0.4? Ubuntu
+java # check java installed ???
+apt-get install openjdk-?-jre-headless # check version on java check
+java -version
+# openjdk version "1.8.0_111"
+mkdir pkg
+cd pkg
+wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.0.0.deb
+dpkg -i elasticsearch-5.0.0.deb
+vi /etc/elasticsearch/elasticsearch.yml
+ # uncomment & change cluster.name: q-monitoring
+ # uncomment & change node.name: ubuntu3
+ # uncomment & change network.host: 192.168.0.4?
+sysctl -w vm.max_map_count=262144
+vm.max_map_count = 262144
+# system level env variable = this tells the kernel how many memory maps it can make
+service elasticsearch start
+curl http://192.168.0.4?:9200
+{
+  "name" : "ubuntu3",
+  "cluster_name" : "q-monitoring",
+  .............
+  "version" : {
+    "number" : "5.0.0",
+    .....
+    .....
+    .....
+    }
+    "tagline" : "You Know, for Search"
+  }
+}
+
+systemctl enable elasticsearch
+# elasticsearch now enabled on reboot
 
 
+## Installing Elasticsearch on Windows (Server 2016/ 2012 or 2008)
+- Installation Instructions (added 19/08/2019)
+# Navigate to the Oracle Java JVM page and download the Server JRE
+# https://www.elastic.co/products/elasticsearch
+# Click download then choose Version 5.0.0 ZIP sha1
+
+# Extract the server-jre-8u112.tar.gz then the .tar then copy or
+ # move the root C:\ & now copy the location - C:\jdk1.8.0\jre
+
+# Goto Computer Settings > Advance system settings > Environment Variables
+ # [New System Variable] = name: JAVA_HOME & value: C:\jdk1.8.0\jre
+
+# Extract the elasticsearch.ZIP and copy or move to C:\
+# Edit C:\elasticsearch-5.0.0\config\elasticsearch.yml
+ # uncomment & change cluster.name: q-monitoring
+ # uncomment & change node.name: ubuntu3
+ # uncomment & change network.host: 192.168.0.4?
+
+# Also Edit C:\elasticsearch-5.0.0\config\jvm.options File
+ # This will set the stack size for Java
+ -Xms2g
+ -Xmx2g
+ -Xss1m # for 64bit Windows
+
+# Run Windows PowerShell as Admin
+cd /
+cd ./elasticsearch-5.0.0\bin
+./elasticsearch-service.bat install Elasticsearch
+ Installing service       : "Elasticsearch"
+ Using JAVA_HOME (64-bit) : "C:\jdk1.8.0_112\jre"
+ The service "Elasticsearch" has been installed.
+PS C:\elasticsearch-5.0.0\bin> start-service Elasticsearch
+> Invoke-WebRequest -Uri http://192.168.0.4?:9200
+StatusCode        :200
 
 
-# Introduction to Logstash
+## Introduction to Logstash
+# ***Logstash is a Data Collection Engine***
 - Logstash Configuration
   input  {  Where is the data coming from
             Logs? Beats?
   }
   filter {  How should we parse the data?
-            Ignore some? Modify any?
+            Ignore some data? Modify any data?
   }
   output {  Where should we store the logs?
             Backend? Elasticsearch?
@@ -68,15 +138,67 @@ Ubuntu 16.10
   grok filter - for parsing unstructured data
                 and turn into structured field
                 data for later use for searching
-  geoip filter - Uses grok 1st to parse out the IP
+  e.g.
+  93.114.45.13 - - [04/Jan/2015:05:14:33 +0000] "GET /images/web...
+  ------------     ---------------------------- -------------------
+  # Parse the segments of the logline and turn it into structured 
+   # field data
+
+- geoip filter - Uses grok 1st to parse out the IP
+  e.g.
+  <grok filter>
+  93.114.45.13 - - [04/Jan/2015:05:14:33 +0000] "GET /images/web...
+  ------------     ---------------------------- -------------------
+  <geoip filter>
+
+  "geoip" : {
+              "timezone" : "America/New York",
+              "ip": "93.114.45.13",
+              "latitude" : 42.9864",
+              "continent_code" : "NA",
+              "city_name" : "Buffalo",
+              ...
+              "region_name" : "New York",
+              "location" : [
+                -78.7279,
+                42.9864
+              ],
+              etc.....,
+              etc.....
+            }
+
+
 
 # Installing Logstash (Unbuntu)
-- Installation Instructions TBC
+- Installation Instructions (added 19/08/2019)
+# Ubuntu Linux Server
+~# cat /etc/issue.net
+Ubuntu 16.10
+apt-get install openjdk-8-jre-headless
+java -version
+# openjdk version "1.8.0_111"
+# add Elastic Repository to our apt sources
+# 1. add the GPG signing key to our key chain
+~# wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
+OK
+# 2. echo the Elastic packages sources directly to our apt source list
+~# echo "deb https://artifacts.elastic.co/packages/5.x/apt stable main" | tee -a /etc/apt/sources.list.d/elastic-5.x.list
+deb https:// artifacts.elastic.co/packages/5.x/apt stable main
+# 3. download the latest packages & install Logstash
+~# apt-get update && apt-get install logstash
+cd /usr/share/logstash/
+.../logstash# bin/logstash -e 'input { stdin { } } output { elasticsearch { hosts => ["192.168.0.12:9200"] } }'
+# type a test message e.g.
+This is a logstash test. Hello, from Quacksville
+# The demo uses a demo postman UI
+# You could try:
+wget http://192.168.0.12:9200/logstash-*/_search
+# Now CTRL+C
+.../logstash# systemctl enable logstash
+.../logstash# service logstash start
 
 
-
-
-# visualizing with Kibana
+## visualizing with Kibana
 - General graphing and visualization tool
   written in Node.json
 - Free, works great with Elasticsearch,
