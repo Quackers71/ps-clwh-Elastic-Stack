@@ -37,76 +37,62 @@ Alerting
   and PagerDuty out of the box.
 
 
-## Installing Elasticsearch on Linux (Ubuntu) or (Centos)
-- Installation Instructions (added 19/08/2019)
-- Test Ubuntu using: cat /etc/issue.net
-Ubuntu 16.10 Server
-ifconfig # take inet address 192.168.0.4? Ubuntu
+## Installing Elasticsearch on Linux (Centos)
+- Installation Instructions (updated 02/04/2020)
+[packt@centos2 pkg]$ cat /etc/system-release
+CentOS Linux release 7.4.1708 (Core)
+
+ifconfig # take inet address 192.168.0.4? Centos2
 # 192.168.0.46 Centos2
-sudo yum install wget
-sudo wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.6.2-linux-x86_64.tar.gz
-sudo tar -xzf elasticsearch-7.6.2-linux-x86_64.tar.gz
-cd elasticsearch-7.6.2
+
+mkdir pkg
+cd pkg
+
 sudo yum install java-1.8.0-openjdk
 java -version
 
-java # check java installed ???
-apt-get install openjdk-?-jre-headless # check version on java check
-java -version
-# openjdk version "1.8.0_111"
-mkdir pkg
-cd pkg
-wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.0.0.deb
-dpkg -i elasticsearch-5.0.0.deb
+sudo yum install wget
+sudo wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.8.7.rpm
+
+# yum remove the previous version
+sudo yum remove elasticsearch
+sudo rm -rf /var/lib/elasticsearch/quacks.monitoring/nodes
+
+sudo rpm -ivh elasticsearch-6.8.7.rpm
+
+sudo systemctl daemon-reload
+sudo systemctl enable elasticsearch.service
 
 # Editing on the Centos2 VM
 sudo vim /etc/elasticsearch/elasticsearch.yml
  # uncomment & change cluster.name: quacks-monitoring
  # uncomment & change node.name: centos2
  # uncomment & change network.host: 192.168.0.46
+ 
 sudo sysctl -w vm.max_map_count=262144
 vm.max_map_count = 262144
 # system level env variable = this tells the kernel how many memory maps it can make
-service elasticsearch start
-curl http://192.168.0.4?:9200
-{
-  "name" : "ubuntu3",
-  "cluster_name" : "quacks-monitoring",
-  .............
-  "version" : {
-    "number" : "5.0.0",
-    .....
-    .....
-    .....
-    }
-    "tagline" : "You Know, for Search"
-  }
-}
 
-systemctl enable elasticsearch
-# elasticsearch now enabled on reboot
-
-## Installing Elasticsearch on Linux (Centos)
-
-I used this guide: https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-elasticsearch-on-centos-7
-
-And will update these notes further tomorrow
+sudo systemctl start elasticsearch.service
 
 [packt@centos2 pkg]$ curl -X GET 'http://192.168.0.46:9200'
 {
-  "status" : 200,
   "name" : "centos2",
-  "cluster_name" : "quacks.monitoring",
+  "cluster_name" : "quacks-monitoring",
+  "cluster_uuid" : "LjSh-HdyQk6rzUkDoKmMUQ",
   "version" : {
-    "number" : "1.7.3",
-    "build_hash" : "05d4530971ef0ea46d0f4fa6ee64dbc8df659682",
-    "build_timestamp" : "2015-10-15T09:14:17Z",
+    "number" : "6.8.7",
+    "build_flavor" : "default",
+    "build_type" : "rpm",
+    "build_hash" : "c63e621",
+    "build_date" : "2020-02-26T14:38:01.193138Z",
     "build_snapshot" : false,
-    "lucene_version" : "4.10.4"
+    "lucene_version" : "7.7.2",
+    "minimum_wire_compatibility_version" : "5.6.0",
+    "minimum_index_compatibility_version" : "5.0.0"
   },
   "tagline" : "You Know, for Search"
 }
-
 
 
 ## Installing Elasticsearch on Windows (Server 2016/ 2012 or 2008)
