@@ -82,7 +82,13 @@ sudo sysctl -w vm.max_map_count=262144
 vm.max_map_count = 262144
 # system level env variable = this tells the kernel how many memory maps it can make
 
-sudo systemctl start elasticsearch.service
+sudo systemctl daemon-reload
+sudo systemctl enable elasticsearch
+sudo systemctl start elasticsearch
+
+# Wait a second for Eelasticsearch to start, then check the open ports on the server,
+# make sure 'state' for port 9200 is 'LISTEN'.
+netstat -plntu
 
 [packt@centos2 pkg]$ curl -X GET 'http://192.168.0.46:9200'
 {
@@ -102,6 +108,11 @@ sudo systemctl start elasticsearch.service
   },
   "tagline" : "You Know, for Search"
 }
+
+or
+curl -XGET 'localhost:9200/_nodes?filter_path=**.mlockall&pretty'
+curl -XGET 'localhost:9200/?pretty'
+
 
 
 ## Installing Elasticsearch on Windows (Server 2016/ 2012 or 2008)
@@ -217,6 +228,28 @@ OpenJDK 64-Bit Server VM (build 25.242-b08, mixed mode)
 
 wget https://artifacts.elastic.co/downloads/kibana/kibana-5.1.1-x86_64.rpm
 rpm -ivh kibana-5.1.1-x86_64.rpm
+
+vim /etc/kibana/kibana.yml
+
+# Uncomment the configuration lines for server.port, server.host and elasticsearch.url.
+
+server.port: 5601
+server.host: "localhost"
+elasticsearch.url: "http://localhost:9200"
+
+sudo systemctl enable kibana
+sudo systemctl start kibana
+
+# Kibana will run on port 5601 as node application.
+netstat -plntu
+
+tcp        0      0 127.0.0.1:5601          0.0.0.0:*               LISTEN      1373/node
+tcp6       0      0 192.168.0.46:9200       :::*                    LISTEN      1398/java
+
+
+
+
+
 
 
 
