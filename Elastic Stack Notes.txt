@@ -45,11 +45,20 @@ CentOS Linux release 7.4.1708 (Core)
 ifconfig # take inet address 192.168.0.4? Centos2
 # 192.168.0.46 Centos2
 
+vim /etc/sysconfig/selinux
+# Change to: SELINUX=disabled
+sudo reboot
+getenforce # check SELinux state
+
 mkdir pkg
 cd pkg
 
 sudo yum install java-1.8.0-openjdk
 java -version
+
+# add Elastic Repository to our apt sources
+# 1. add the GPG signing key to our key chain
+sudo rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
 
 sudo yum install wget
 sudo wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.8.7.rpm
@@ -68,7 +77,7 @@ sudo vim /etc/elasticsearch/elasticsearch.yml
  # uncomment & change cluster.name: quacks-monitoring
  # uncomment & change node.name: centos2
  # uncomment & change network.host: 192.168.0.46
- 
+  
 sudo sysctl -w vm.max_map_count=262144
 vm.max_map_count = 262144
 # system level env variable = this tells the kernel how many memory maps it can make
@@ -191,18 +200,29 @@ StatusCode        :200
               etc.....
             }
 
+# FYI
+https://www.howtoforge.com/tutorial/how-to-install-elastic-stack-on-centos-7/
 
+# Installing Logstash (Centos2)
+- Installation Instructions (updated 22/04/2020)
 
-# Installing Logstash (Unbuntu)
-- Installation Instructions (added 19/08/2019)
-# Ubuntu Linux Server
-~# cat /etc/issue.net
-Ubuntu 16.10
-apt-get install openjdk-8-jre-headless
+# CentOS Linux Server
+[packt@centos2 ~]$ cat /etc/system-release
+CentOS Linux release 7.4.1708 (Core)
+
 java -version
-# openjdk version "1.8.0_111"
-# add Elastic Repository to our apt sources
-# 1. add the GPG signing key to our key chain
+openjdk version "1.8.0_242"
+OpenJDK Runtime Environment (build 1.8.0_242-b08)
+OpenJDK 64-Bit Server VM (build 25.242-b08, mixed mode)
+
+wget https://artifacts.elastic.co/downloads/kibana/kibana-5.1.1-x86_64.rpm
+rpm -ivh kibana-5.1.1-x86_64.rpm
+
+
+
+
+
+
 ~# wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
 OK
 # 2. echo the Elastic packages sources directly to our apt source list
