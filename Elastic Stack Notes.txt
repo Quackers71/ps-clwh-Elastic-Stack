@@ -69,9 +69,6 @@ sudo rm -rf /var/lib/elasticsearch/quacks.monitoring/nodes
 
 sudo rpm -ivh elasticsearch-6.8.7.rpm
 
-sudo systemctl daemon-reload
-sudo systemctl enable elasticsearch.service
-
 # Editing on the Centos2 VM
 sudo vim /etc/elasticsearch/elasticsearch.yml
  # uncomment & change cluster.name: quacks-monitoring
